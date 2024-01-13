@@ -69,10 +69,17 @@ export class SchedulesController {
     @Get()
     async findAll(@Req() req: Request, @Res() res: Response) {
         try {
-            if (req?.user?.role !== 'director' && req?.user?.role !== 'teacher') throw new Forbidden();
+            if (req?.user?.role !== 'director' && req?.user?.role !== 'teacher' && req?.user?.role !== 'student') throw new Forbidden();
 
             if(req?.user?.role === 'teacher') {
                 const result = await this.schedulesService.findAllByTeacherId(req?.user?.id);
+                return res.json({
+                    ok: true,
+                    message: 'Schedules successfully found',
+                    data: result,
+                });
+            } else if(req?.user?.role === 'student') {
+                const result = await this.schedulesService.findAllByGroupId(req?.user?.group?.id);
                 return res.json({
                     ok: true,
                     message: 'Schedules successfully found',
@@ -128,7 +135,6 @@ export class SchedulesController {
         try {
             if (req?.user?.role !== 'director') throw new Forbidden();
 
-            console.log(id)
             let validId = commonValidator.path.validate([id]);
             if (validId?.error) throw new BadRequest('Invalid id', 'INVALID_ID');
 

@@ -37,6 +37,7 @@ export class UsersService {
     async findAllByRoleAndGroup(role: string, group_id: number) {
         let users = await this.usersRepository.find({
             where: { role, group: { id: group_id }, deleted: false, active: true },
+            select: ['id', 'full_name', 'username', 'role', 'group', 'createdAt', 'updatedAt', 'deleted', 'deletedAt'],
         });
         return users ? users : [];
     }
@@ -55,15 +56,12 @@ export class UsersService {
             where: { username, deleted: false, active: true },
             select: ['id'],
         };
-        console.log(username)
-        console.log(queryOptions)
     
         if (excludeUserId) {
             queryOptions.where['id'] = Not(excludeUserId);
         }
     
         const user = await this.usersRepository.findOne(queryOptions);
-        console.log(user)
         return !!user;
     }
 
@@ -74,7 +72,7 @@ export class UsersService {
 
     async findOneByGroupAndId(group_id: number, id: number) {
         let user = await this.usersRepository.findOne({
-            where: { id, group: { id: group_id }, deleted: false },
+            where: { id, group: { id: group_id }, deleted: false, active: true },
         });
         return user;
     }

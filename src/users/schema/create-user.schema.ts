@@ -6,4 +6,5 @@ export const createUserSchema = Joi.object({
   password: Joi.string().min(6).required(),
   group_id: Joi.number().required(),
   role: Joi.string().valid("student", "director", "teacher").required(),
+  active: Joi.boolean(),
 });

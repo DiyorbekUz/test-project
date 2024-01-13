@@ -46,7 +46,6 @@ export class GroupsController {
     @Get()
     async findAll(@Req() req: Request, @Res() res: Response) {
         try {
-            console.log(req)
             if (req?.user?.role !== 'director') throw new Forbidden();
 
             const result = await this.groupsService.findAll();

@@ -35,6 +35,10 @@ $ npm install
 ## Running the app
 
 ```bash
+When we run the code for the first time, we need to use the migrate command.
+#migration 
+$ npm run migrate
+
 # development
 $ npm run start
 

@@ -94,6 +94,8 @@ export class UsersController {
             if (req?.user?.role === 'teacher') {
                 const result = await this.usersService.findOneByGroupAndId(req?.user?.group?.id, +id);
                 if (!result) throw new NotFound('User');
+
+                delete result?.password;
                 return res.json({
                     ok: true,
                     message: 'User successfully found',
@@ -103,6 +105,8 @@ export class UsersController {
 
             const result = await this.usersService.findOne(+id);
             if (!result) throw new NotFound('User');
+
+            delete result?.password;
 
             return res.json({
                 ok: true,

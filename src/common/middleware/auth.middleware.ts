@@ -25,9 +25,7 @@ export class AuthMiddleware implements NestMiddleware {
     constructor(private connection: Connection) { }
     async use(req: Request, res: Response, next: NextFunction) {
         try {
-            console.log(req.headers);
             const { authorization } = req.headers;
-            console.log(authorization)
             if (!authorization) throw new Unauthorized();
 
             const [_, token] = authorization.split(" ");

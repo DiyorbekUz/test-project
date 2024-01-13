@@ -5,4 +5,5 @@ export const updateUserSchema = Joi.object({
     username: Joi.string(),
     role: Joi.string().valid("student", "director", "teacher"),
     group_id: Joi.number(),
+    activ: Joi.boolean(),
 });
