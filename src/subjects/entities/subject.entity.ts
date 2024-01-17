@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, BeforeUpdate } from 'typeorm';
 import { Schedule } from '../../schedules/entities/schedule.entity';
 import { Grade } from 'src/grades/entities/grade.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @Entity({ name: 'subjects' })
 export class Subject {
@@ -35,4 +36,7 @@ export class Subject {
     updateTimestamp() {
         this.updatedAt = new Date();
     }
+
+    @OneToMany(() => User, user => user.subjects)
+    users: User[];
 }

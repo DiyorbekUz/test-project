@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { UpdateSubjectDto } from './dto/update-subject.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Subject } from './entities/subject.entity';
 
 @Injectable()
@@ -23,6 +23,14 @@ export class SubjectsService {
         });
         return subjects ? subjects : [];
     }
+
+    async findByIds(ids: number[]) {
+        let subjects = await this.subjectsRepository.find({
+          where: { id: In(ids), deleted: false, active: true },
+        });
+        return subjects ? subjects : [];
+      }
+      
 
     async findOne(id: number) {
         return this.subjectsRepository.findOne({

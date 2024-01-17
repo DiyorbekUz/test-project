@@ -2,6 +2,8 @@ import { PrimaryGeneratedColumn, Column, ManyToOne, Entity, JoinColumn, OneToMan
 import { Group } from 'src/groups/entities/group.entity';
 import { Grade } from 'src/grades/entities/grade.entity';
 import { Schedule } from 'src/schedules/entities/schedule.entity';
+import { CreateGradeDto } from '../dto/create-grade.dto';
+import { Subject } from 'src/subjects/entities/subject.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -55,4 +57,11 @@ export class User {
     updateTimestamp() {
         this.updatedAt = new Date();
     }
+
+    @Column({ type: "json", nullable: true })
+    gradess: Array<CreateGradeDto>;
+
+    @Column({ type: 'simple-json', nullable: true, select: false })
+    @OneToMany(() => Subject, subject => subject.users)
+    subjects: Subject[];
 }

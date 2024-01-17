@@ -2,12 +2,15 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Res, UseGuards 
 import { Request, Response } from 'express';
 import { UsersService } from './users.service';
 import { GroupsService } from 'src/groups/groups.service';
+import { SubjectsService } from 'src/subjects/subjects.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { CreateGradeDto } from './dto/create-grade.dto';
 import { Forbidden, BadRequest, NotFound } from '../common/exception/error.exception';
 import { createUserSchema } from './schema/create-user.schema';
 import { updatePasswordSchema } from './schema/update-password.schema';
+import { createGradeSchema } from './schema/create-grade.schema';
 import { updateUserSchema } from './schema/update-user.schema';
 import { handleErrorResponse } from '../utils/error-handler.util';
 import * as commonValidator from '../utils/common-validator.util';
@@ -20,6 +23,7 @@ export class UsersController {
     constructor(
         private readonly usersService: UsersService,
         private readonly groupsService: GroupsService,
+        private readonly subjectsService: SubjectsService,
         ) { }
         
     @Post()
@@ -49,6 +53,37 @@ export class UsersController {
             return res.json({
                 ok: true,
                 message: 'User successfully created',
+                data: result,
+            });
+        } catch (error) {
+            console.error(error);
+            handleErrorResponse(res, error);
+        }
+    }
+
+    @Post(':id')
+    async createGrade(@Param('id') id: number, @Body() createGradeData: CreateGradeDto, @Req() req: Request, @Res() res: Response) {
+        try {
+            if (req?.user?.role !== 'director' && req?.user?.role !== 'teacher') throw new Forbidden();
+
+            let oneUser = await this.usersService.findOne(+id);
+            if(!oneUser) throw new NotFound('User', 'USER_NOT_FOUND');
+
+            const { error } = createGradeSchema.validate(createGradeData);
+            if (error) throw new BadRequest(error.message, 'INVALID_FIELDS');
+
+            let oneSubject = await this.subjectsService.findOne(+createGradeData?.subject_id);
+            if(!oneSubject) throw new NotFound('Subject', 'SUBJECT_NOT_FOUND');
+
+            let gradess = oneUser.gradess || [];
+            gradess.push(createGradeData);
+
+            const result = await this.usersService.createGrade(id, gradess);
+            if (!result) throw new BadRequest('Failed to create grade', 'CREATE_GRADE_FAILED')
+
+            return res.json({
+                ok: true,
+                message: 'Grade successfully updated',
                 data: result,
             });
         } catch (error) {
