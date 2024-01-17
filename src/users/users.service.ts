@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { CreateGradeDto } from './dto/create-grade.dto';
+import { CreateGradeUserDto } from './dto/create-grade.dto';
 import { User } from './entities/user.entity';
 import { Subject } from 'src/subjects/entities/subject.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -28,18 +28,18 @@ export class UsersService {
         return user;
     }
 
-    async createGrade(id: number, createGradeDto: CreateGradeDto[]) {
+    async createGrade(id: number, CreateGradeUserDto: CreateGradeUserDto[]) {
         const user = await this.usersRepository.findOne({
             where: { id, deleted: false, active: true },
             select: ['id', 'full_name', 'username', 'role', 'group', 'createdAt', 'updatedAt', 'deleted', 'deletedAt'],
         });
 
-        user.gradess = createGradeDto;
+        user.gradess = CreateGradeUserDto;
         await this.usersRepository.save(user);
         return user;
     }
 
-    private async fetchSubjectsForUser(gradeDtos: CreateGradeDto[]): Promise<{ [key: string]: Subject }> {
+    private async fetchSubjectsForUser(gradeDtos: CreateGradeUserDto[]): Promise<{ [key: string]: Subject }> {
         const subjectIds = gradeDtos?.map((gradeDto) => gradeDto.subject_id) || [];
         const subjects = await this.subjectRepository.findByIds(subjectIds);
 
@@ -94,6 +94,15 @@ export class UsersService {
         user?.gradess?.forEach((gradeDto) => {
             const subjectId = gradeDto.subject_id.toString();
             gradeDto.subject = subjectMap[subjectId];
+        });
+        return user;
+    }
+
+    async findOneWithOutSubject(id: number) {
+        let user = await this.usersRepository.findOne({
+            where: { id, deleted: false, active: true },
+            relations: ['group'],
+            select: ['id', 'full_name', 'username', 'role', 'group', 'createdAt', 'updatedAt', 'deleted', 'deletedAt', 'gradess'],
         });
         return user;
     }

@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Subject } from 'src/subjects/entities/subject.entity';
 
-export class CreateGradeDto {
+export class CreateGradeUserDto {
     @ApiProperty({
         description: 'grade',
         minimum: 2,

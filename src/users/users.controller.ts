@@ -6,7 +6,7 @@ import { SubjectsService } from 'src/subjects/subjects.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
-import { CreateGradeDto } from './dto/create-grade.dto';
+import { CreateGradeUserDto } from './dto/create-grade.dto';
 import { Forbidden, BadRequest, NotFound } from '../common/exception/error.exception';
 import { createUserSchema } from './schema/create-user.schema';
 import { updatePasswordSchema } from './schema/update-password.schema';
@@ -61,12 +61,12 @@ export class UsersController {
         }
     }
 
-    @Post(':id')
-    async createGrade(@Param('id') id: number, @Body() createGradeData: CreateGradeDto, @Req() req: Request, @Res() res: Response) {
+    @Post('grade/:id')
+    async createGrade(@Param('id') id: number, @Body() createGradeData: CreateGradeUserDto, @Req() req: Request, @Res() res: Response) {
         try {
             if (req?.user?.role !== 'director' && req?.user?.role !== 'teacher') throw new Forbidden();
 
-            let oneUser = await this.usersService.findOne(+id);
+            let oneUser = await this.usersService.findOneWithOutSubject(+id);
             if(!oneUser) throw new NotFound('User', 'USER_NOT_FOUND');
 
             const { error } = createGradeSchema.validate(createGradeData);
