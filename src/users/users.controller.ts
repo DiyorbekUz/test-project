@@ -86,7 +86,7 @@ export class UsersController {
                 message: 'Grade successfully updated',
                 data: result,
             });
-        } catch (error) {
+        } catch (error) {   
             console.error(error);
             handleErrorResponse(res, error);
         }
